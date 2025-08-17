@@ -1,0 +1,9 @@
+[
+  { "id": "111", "name": "Asia", "hasCountries": true },
+  { "id": "112", "name": "Europe", "hasCountries": true },
+  { "id": "113", "name": "Africa", "hasCountries": true },
+  { "id": "114", "name": "Oceania", "hasCountries": true },
+  { "id": "115", "name": "Americas", "hasCountries": true },
+  { "id": "116", "name": "Polar", "hasCountries": true },
+  { "id": "117", "name": "Antarctic", "hasCountries": true }
+]
