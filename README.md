@@ -17,14 +17,14 @@ A comprehensive JSON dataset containing a hierarchical list of countries, states
 
 ## Installation
 
-### NPM (Recommended)
+### PNPM (Recommended)
 ```bash
-npm install country-state-data
+pnpm add country-state-data
 ```
 
-### Yarn
+### NPM
 ```bash
-yarn add country-state-data
+npm install country-state-data
 ```
 
 ### Direct Download
@@ -34,7 +34,7 @@ Download the JSON files directly from this repository for local use.
 
 ```javascript
 // Install the package
-npm install country-state-data
+pnpm add country-state-data
 
 // Import and use
 import countries from 'country-state-data/countries';
