@@ -17,13 +17,40 @@ A comprehensive JSON dataset containing a hierarchical list of countries, states
 
 ## Installation
 
-### NPM
+### NPM (Recommended)
 ```bash
 npm install country-state-data
 ```
 
+### Yarn
+```bash
+yarn add country-state-data
+```
+
 ### Direct Download
-Download the JSON files directly from this repository.
+Download the JSON files directly from this repository for local use.
+
+## Quick Start
+
+```javascript
+// Install the package
+npm install country-state-data
+
+// Import and use
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
+
+// Get all countries
+console.log(countries.length); // 250 countries
+
+// Find USA
+const usa = countries.find(c => c.iso2 === 'US');
+console.log(usa.name); // "United States"
+
+// Get US states
+const usStates = states.filter(s => s.country_code === 'US');
+console.log(usStates.length); // 50+ states/territories
+```
 
 ## Available Data Files
 
@@ -112,10 +139,13 @@ Download the JSON files directly from this repository.
 
 ## Usage Examples
 
-### JavaScript (Node.js)
+### JavaScript (Node.js/CommonJS)
 ```javascript
-const countries = require('./countries.json');
-const states = require('./states.json');
+const countries = require('country-state-data/countries');
+const states = require('country-state-data/states');
+const cities = require('country-state-data/cities');
+const regions = require('country-state-data/regions');
+const languages = require('country-state-data/languages');
 
 // Get all countries
 console.log(countries);
@@ -131,36 +161,52 @@ console.log(usStates);
 // Get countries by region
 const asianCountries = countries.filter(country => country.region === 'Asia');
 console.log(asianCountries);
+
+// Find a specific language
+const english = languages.find(lang => lang.code === 'en');
+console.log(english); // { code: 'en', name: 'English', native: 'English' }
 ```
 
-### JavaScript (Browser)
+### JavaScript (ES6 Modules)
 ```javascript
-// Using fetch API
-async function loadCountries() {
-  const response = await fetch('./countries.json');
-  const countries = await response.json();
-  return countries;
-}
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
+import cities from 'country-state-data/cities';
 
-// Using in a dropdown
-async function populateCountryDropdown() {
-  const countries = await loadCountries();
-  const select = document.getElementById('countrySelect');
+// Get all countries
+console.log(countries);
+
+// Create a country dropdown
+function createCountryDropdown() {
+  const select = document.createElement('select');
   
   countries.forEach(country => {
     const option = document.createElement('option');
     option.value = country.iso2;
-    option.textContent = country.name;
+    option.textContent = `${country.emoji} ${country.name}`;
     select.appendChild(option);
   });
+  
+  return select;
+}
+
+// Handle country selection change
+function onCountryChange(countryCode) {
+  const country = countries.find(c => c.iso2 === countryCode);
+  const countryStates = states.filter(s => s.country_code === countryCode);
+  
+  console.log(`Selected: ${country.name}`);
+  console.log(`States: ${countryStates.length}`);
 }
 ```
 
 ### TypeScript
 ```typescript
-import { Country, State, City } from './types';
-import countries from './countries.json';
-import states from './states.json';
+import { Country, State, Region, Language } from 'country-state-data/types';
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
+import regions from 'country-state-data/regions';
+import languages from 'country-state-data/languages';
 
 // Type-safe country operations
 const getCountryByCode = (code: string): Country | undefined => {
@@ -172,7 +218,12 @@ const getStatesByCountry = (countryId: number): State[] => {
   return states.filter((state: State) => state.country_id === countryId);
 };
 
-// Create a country selector component
+// Get countries by region with type safety
+const getCountriesByRegion = (regionName: string): Country[] => {
+  return countries.filter((country: Country) => country.region === regionName);
+};
+
+// React component example
 interface CountrySelectorProps {
   onSelect: (country: Country) => void;
 }
@@ -183,9 +234,23 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({ onSelect }) => {
       const country = getCountryByCode(e.target.value);
       if (country) onSelect(country);
     }}>
+      <option value="">Select a country</option>
       {countries.map((country: Country) => (
         <option key={country.id} value={country.iso2}>
           {country.emoji} {country.name}
+        </option>
+      ))}
+    </select>
+  );
+};
+
+// Language selector component
+const LanguageSelector: React.FC = () => {
+  return (
+    <select>
+      {languages.map((language: Language) => (
+        <option key={language.code} value={language.code}>
+          {language.native} ({language.name})
         </option>
       ))}
     </select>
@@ -195,86 +260,187 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({ onSelect }) => {
 
 ### Advanced Usage Examples
 
-#### Creating Cascading Dropdowns
+#### Real-World Example: E-commerce Address Form
 ```typescript
-import { Country, State } from './types';
-import countries from './countries.json';
-import states from './states.json';
+import { Country, State } from 'country-state-data/types';
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
 
-class LocationSelector {
+class AddressForm {
   private countries: Country[] = countries;
   private states: State[] = states;
 
-  getCountries(): Country[] {
-    return this.countries;
-  }
-
-  getStatesByCountryCode(countryCode: string): State[] {
-    const country = this.countries.find(c => c.iso2 === countryCode);
-    if (!country) return [];
+  // Create cascading country/state dropdowns
+  createCountryDropdown(onCountryChange: (countryCode: string) => void) {
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="">Select Country</option>';
     
-    return this.states.filter(state => state.country_id === country.id);
+    this.countries.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country.iso2;
+      option.textContent = `${country.emoji} ${country.name}`;
+      select.appendChild(option);
+    });
+    
+    select.onchange = (e) => onCountryChange((e.target as HTMLSelectElement).value);
+    return select;
   }
 
-  getCountriesByRegion(region: string): Country[] {
-    return this.countries.filter(country => country.region === region);
+  createStateDropdown(countryCode: string) {
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="">Select State</option>';
+    
+    const country = this.countries.find(c => c.iso2 === countryCode);
+    if (!country) return select;
+    
+    const countryStates = this.states.filter(state => state.country_id === country.id);
+    
+    countryStates.forEach(state => {
+      const option = document.createElement('option');
+      option.value = state.state_code;
+      option.textContent = state.name;
+      select.appendChild(option);
+    });
+    
+    return select;
   }
 
-  searchCountries(query: string): Country[] {
-    const lowercaseQuery = query.toLowerCase();
-    return this.countries.filter(country => 
-      country.name.toLowerCase().includes(lowercaseQuery) ||
-      country.native.toLowerCase().includes(lowercaseQuery)
-    );
-  }
-}
-
-// Usage
-const locationSelector = new LocationSelector();
-const usStates = locationSelector.getStatesByCountryCode('US');
-const asianCountries = locationSelector.getCountriesByRegion('Asia');
-```
-
-#### Form Validation
-```typescript
-import { Country, State } from './types';
-import countries from './countries.json';
-import states from './states.json';
-
-interface AddressForm {
-  country: string;
-  state: string;
-  city: string;
-}
-
-class AddressValidator {
-  validateCountry(countryCode: string): boolean {
-    return countries.some(country => country.iso2 === countryCode);
-  }
-
-  validateState(stateCode: string, countryCode: string): boolean {
-    const country = countries.find(c => c.iso2 === countryCode);
+  // Validate address data
+  validateAddress(countryCode: string, stateCode?: string): boolean {
+    const country = this.countries.find(c => c.iso2 === countryCode);
     if (!country) return false;
 
-    return states.some(state => 
-      state.state_code === stateCode && 
-      state.country_id === country.id
-    );
+    if (stateCode) {
+      return this.states.some(state => 
+        state.state_code === stateCode && 
+        state.country_id === country.id
+      );
+    }
+    
+    return true;
   }
 
+  // Get phone format for country
   getPhoneFormat(countryCode: string): string {
-    const country = countries.find(c => c.iso2 === countryCode);
+    const country = this.countries.find(c => c.iso2 === countryCode);
     return country ? `+${country.phone_code}` : '';
   }
 
-  getCurrencyInfo(countryCode: string): { currency: string; symbol: string } | null {
-    const country = countries.find(c => c.iso2 === countryCode);
+  // Get currency info for pricing
+  getCurrencyInfo(countryCode: string) {
+    const country = this.countries.find(c => c.iso2 === countryCode);
     return country ? {
       currency: country.currency,
-      symbol: country.currency_symbol
+      symbol: country.currency_symbol,
+      name: country.currency_name
     } : null;
   }
 }
+
+// Usage example
+const addressForm = new AddressForm();
+const countryDropdown = addressForm.createCountryDropdown((countryCode) => {
+  const stateDropdown = addressForm.createStateDropdown(countryCode);
+  document.getElementById('state-container')?.appendChild(stateDropdown);
+  
+  // Update phone format
+  const phoneInput = document.getElementById('phone') as HTMLInputElement;
+  phoneInput.placeholder = addressForm.getPhoneFormat(countryCode) + ' XXX XXXX';
+  
+  // Update currency display
+  const currency = addressForm.getCurrencyInfo(countryCode);
+  const priceDisplay = document.getElementById('price');
+  if (priceDisplay && currency) {
+    priceDisplay.textContent = `Price: ${currency.symbol}99.99 ${currency.currency}`;
+  }
+});
+```
+
+#### Search and Filter Functionality
+```typescript
+import { Country, State, Language } from 'country-state-data/types';
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
+import languages from 'country-state-data/languages';
+
+class LocationSearchService {
+  // Search countries by name or native name
+  searchCountries(query: string): Country[] {
+    const lowercaseQuery = query.toLowerCase();
+    return countries.filter(country => 
+      country.name.toLowerCase().includes(lowercaseQuery) ||
+      country.native.toLowerCase().includes(lowercaseQuery) ||
+      country.iso2.toLowerCase() === lowercaseQuery ||
+      country.iso3.toLowerCase() === lowercaseQuery
+    );
+  }
+
+  // Get countries by region
+  getCountriesByRegion(region: string): Country[] {
+    return countries.filter(country => country.region === region);
+  }
+
+  // Get countries by currency
+  getCountriesByCurrency(currencyCode: string): Country[] {
+    return countries.filter(country => country.currency === currencyCode);
+  }
+
+  // Get states by country
+  getStatesByCountry(countryCode: string): State[] {
+    const country = countries.find(c => c.iso2 === countryCode);
+    if (!country) return [];
+    return states.filter(state => state.country_id === country.id);
+  }
+
+  // Search languages
+  searchLanguages(query: string): Language[] {
+    const lowercaseQuery = query.toLowerCase();
+    return languages.filter(lang =>
+      lang.name.toLowerCase().includes(lowercaseQuery) ||
+      lang.native.toLowerCase().includes(lowercaseQuery) ||
+      lang.code.toLowerCase() === lowercaseQuery
+    );
+  }
+
+  // Get unique regions
+  getRegions(): string[] {
+    return [...new Set(countries.map(country => country.region))];
+  }
+
+  // Get unique currencies
+  getCurrencies(): Array<{code: string, name: string, symbol: string}> {
+    const currencies = new Map();
+    countries.forEach(country => {
+      if (!currencies.has(country.currency)) {
+        currencies.set(country.currency, {
+          code: country.currency,
+          name: country.currency_name,
+          symbol: country.currency_symbol
+        });
+      }
+    });
+    return Array.from(currencies.values());
+  }
+}
+
+// Usage examples
+const searchService = new LocationSearchService();
+
+// Search for countries
+const usaResults = searchService.searchCountries('united');
+const japanResults = searchService.searchCountries('JP');
+
+// Filter by region
+const europeanCountries = searchService.getCountriesByRegion('Europe');
+
+// Get USD countries
+const usdCountries = searchService.getCountriesByCurrency('USD');
+
+// Get all regions for a dropdown
+const regions = searchService.getRegions();
+
+// Get all currencies
+const currencies = searchService.getCurrencies();
 ```
 
 ## Use Cases
@@ -297,12 +463,27 @@ class AddressValidator {
 
 ## TypeScript Support
 
-This package includes TypeScript definitions in `types.d.ts`. The types are automatically recognized when importing JSON files:
+This package includes comprehensive TypeScript definitions. All imports are automatically typed:
 
 ```typescript
-import countries from './countries.json'; // Automatically typed as Country[]
-import states from './states.json';       // Automatically typed as State[]
+import { Country, State, Language } from 'country-state-data/types';
+import countries from 'country-state-data/countries'; // Country[]
+import states from 'country-state-data/states';       // State[]
+import languages from 'country-state-data/languages'; // Language[]
+
+// Full type safety
+const usa: Country = countries.find(c => c.iso2 === 'US')!;
+const californiaStates: State[] = states.filter(s => s.country_code === 'US');
 ```
+
+### Available Types
+- `Country` - Complete country information with ISO codes, currency, timezone, etc.
+- `State` - State/province information with coordinates
+- `City` - City data organized by country and state
+- `Region` - World regions
+- `Language` - Language codes with native names
+- `Timezone` - Timezone information with GMT offsets
+- `Translations` - Country name translations
 
 ## Contributing
 
