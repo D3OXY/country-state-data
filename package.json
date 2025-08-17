@@ -1,0 +1,60 @@
+{
+  "name": "country-state-data",
+  "version": "1.0.0",
+  "description": "A comprehensive JSON dataset containing countries, states, cities, regions, and languages with TypeScript support",
+  "main": "countries.json",
+  "types": "types.d.ts",
+  "files": [
+    "countries.json",
+    "states.json",
+    "cities.json",
+    "regions.json",
+    "languages.json",
+    "types.d.ts",
+    "README.md"
+  ],
+  "keywords": [
+    "countries",
+    "states",
+    "cities",
+    "regions",
+    "languages",
+    "json",
+    "data",
+    "typescript",
+    "iso",
+    "geographical",
+    "location",
+    "address",
+    "dropdown",
+    "form",
+    "validation",
+    "i18n",
+    "internationalization"
+  ],
+  "author": "d3oxy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d3oxy/country-state-data.git"
+  },
+  "bugs": {
+    "url": "https://github.com/d3oxy/country-state-data/issues"
+  },
+  "homepage": "https://github.com/d3oxy/country-state-data#readme",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "exports": {
+    ".": {
+      "types": "./types.d.ts",
+      "default": "./countries.json"
+    },
+    "./countries": "./countries.json",
+    "./states": "./states.json",
+    "./cities": "./cities.json",
+    "./regions": "./regions.json",
+    "./languages": "./languages.json",
+    "./types": "./types.d.ts"
+  }
+}
