@@ -36,7 +36,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/d3oxy/country-state-data.git"
+    "url": "git+https://github.com/d3oxy/country-state-data.git"
   },
   "bugs": {
     "url": "https://github.com/d3oxy/country-state-data/issues"
