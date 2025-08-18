@@ -1,10 +1,12 @@
 {
   "name": "country-state-data",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive JSON dataset containing countries, states, cities, regions, and languages with TypeScript support",
-  "main": "countries.json",
-  "types": "types.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "files": [
+    "index.js",
+    "index.d.ts",
     "countries.json",
     "states.json",
     "cities.json",
@@ -47,8 +49,8 @@
   },
   "exports": {
     ".": {
-      "types": "./types.d.ts",
-      "default": "./countries.json"
+      "types": "./index.d.ts",
+      "default": "./index.js"
     },
     "./countries": "./countries.json",
     "./states": "./states.json",

@@ -32,24 +32,45 @@ Download the JSON files directly from this repository for local use.
 
 ## Quick Start
 
+### Using the main API (Recommended)
 ```javascript
 // Install the package
 pnpm add country-state-data
 
-// Import and use
-import countries from 'country-state-data/countries';
-import states from 'country-state-data/states';
+// Import the main API
+import countryStateData from 'country-state-data';
 
 // Get all countries
+const countries = countryStateData.getAllCountries();
 console.log(countries.length); // 250 countries
 
-// Find USA
-const usa = countries.find(c => c.iso2 === 'US');
+// Find USA by code
+const usa = countryStateData.getCountryByCode('US');
 console.log(usa.name); // "United States"
 
 // Get US states
-const usStates = states.filter(s => s.country_code === 'US');
+const usStates = countryStateData.getStatesByCountry('US');
 console.log(usStates.length); // 50+ states/territories
+
+// Search for countries
+const searchResults = countryStateData.searchCountries('united');
+console.log(searchResults); // Returns USA, UAE, UK
+
+// Validate country code
+const isValid = countryStateData.isValidCountryCode('US'); // true
+
+// Get country flag emoji
+const flag = countryStateData.getCountryFlag('JP'); // 🇯🇵
+```
+
+### Direct JSON import (Alternative)
+```javascript
+import countries from 'country-state-data/countries';
+import states from 'country-state-data/states';
+
+// Direct access to raw data
+const usa = countries.find(c => c.iso2 === 'US');
+const usStates = states.filter(s => s.country_code === 'US');
 ```
 
 ## Available Data Files
@@ -137,34 +158,130 @@ console.log(usStates.length); // 50+ states/territories
 }
 ```
 
+## API Documentation
+
+### Main API Methods
+
+The package provides a comprehensive API through the main export:
+
+```javascript
+const countryStateData = require('country-state-data');
+// or
+import countryStateData from 'country-state-data';
+```
+
+#### Country Methods
+- `getAllCountries()` - Returns all countries
+- `getCountryByCode(code)` - Get country by ISO2 or ISO3 code
+- `getCountryById(id)` - Get country by numeric ID
+- `getCountriesByRegion(regionName)` - Get countries in a region
+- `getCountriesBySubregion(subregionName)` - Get countries in a subregion
+- `searchCountries(query)` - Search countries by name, native name, capital, or nationality
+- `getCountriesByCurrency(currencyCode)` - Get countries using a currency
+- `getCountriesByPhoneCode(phoneCode)` - Get countries by phone code
+
+#### State/Province Methods
+- `getAllStates()` - Returns all states/provinces
+- `getStatesByCountry(countryCode)` - Get states by country ISO code
+- `getStatesByCountryId(countryId)` - Get states by country ID
+- `getStateByCode(stateCode, countryCode)` - Get specific state
+- `searchStates(query, countryCode?)` - Search states, optionally within a country
+
+#### City Methods
+- `getCitiesByState(stateId)` - Get cities in a state
+- `getCitiesByCountry(countryCode)` - Get all cities in a country
+- `searchCities(query, countryCode?, stateId?)` - Search cities
+
+#### Region Methods
+- `getAllRegions()` - Get all regions
+- `getRegionById(regionId)` - Get region by ID
+- `getUniqueRegions()` - Get unique region names
+- `getUniqueSubregions()` - Get unique subregion names
+
+#### Language Methods
+- `getAllLanguages()` - Get all languages
+- `getLanguageByCode(code)` - Get language by ISO code
+- `searchLanguages(query)` - Search languages
+
+#### Currency Methods
+- `getAllCurrencies()` - Get all unique currencies
+- `getCurrencyByCode(currencyCode)` - Get currency details
+
+#### Timezone Methods
+- `getAllTimezones()` - Get all unique timezones
+- `getCountriesByTimezone(zoneName)` - Get countries in a timezone
+
+#### Validation Methods
+- `isValidCountryCode(code)` - Validate country code
+- `isValidStateCode(stateCode, countryCode)` - Validate state code
+- `isValidLanguageCode(code)` - Validate language code
+- `isValidCurrencyCode(code)` - Validate currency code
+
+#### Utility Methods
+- `getCountryFlag(countryCode)` - Get country flag emoji
+- `getCountryPhoneFormat(countryCode)` - Get phone format with country code
+- `getCountryInfo(countryCode)` - Get extended country info with state/city counts
+- `getStatistics()` - Get data statistics
+
 ## Usage Examples
 
-### JavaScript (Node.js/CommonJS)
+### Using the Main API (Recommended)
+```javascript
+const countryStateData = require('country-state-data');
+// or ES6: import countryStateData from 'country-state-data';
+
+// Get all countries
+const allCountries = countryStateData.getAllCountries();
+console.log(`Total countries: ${allCountries.length}`);
+
+// Find USA
+const usa = countryStateData.getCountryByCode('US');
+console.log(usa.name); // "United States"
+console.log(usa.capital); // "Washington"
+console.log(usa.emoji); // "🇺🇸"
+
+// Get US states
+const usStates = countryStateData.getStatesByCountry('US');
+console.log(`US has ${usStates.length} states/territories`);
+
+// Search for cities
+const newYorkCities = countryStateData.searchCities('New York', 'US');
+console.log(newYorkCities);
+
+// Get countries by region
+const asianCountries = countryStateData.getCountriesByRegion('Asia');
+console.log(`Asia has ${asianCountries.length} countries`);
+
+// Currency operations
+const usdCountries = countryStateData.getCountriesByCurrency('USD');
+console.log('Countries using USD:', usdCountries.map(c => c.name));
+
+// Validation
+console.log(countryStateData.isValidCountryCode('US')); // true
+console.log(countryStateData.isValidCountryCode('XX')); // false
+
+// Get statistics
+const stats = countryStateData.getStatistics();
+console.log(stats);
+// {
+//   totalCountries: 250,
+//   totalStates: 5000+,
+//   totalLanguages: 180+,
+//   totalRegions: 7,
+//   totalCurrencies: 160+,
+//   totalTimezones: 400+
+// }
+```
+
+### Direct JSON Import (Alternative)
 ```javascript
 const countries = require('country-state-data/countries');
 const states = require('country-state-data/states');
 const cities = require('country-state-data/cities');
-const regions = require('country-state-data/regions');
-const languages = require('country-state-data/languages');
 
-// Get all countries
-console.log(countries);
-
-// Find a specific country
+// Direct access to raw JSON data
 const usa = countries.find(country => country.iso2 === 'US');
-console.log(usa);
-
-// Get states for a specific country
 const usStates = states.filter(state => state.country_code === 'US');
-console.log(usStates);
-
-// Get countries by region
-const asianCountries = countries.filter(country => country.region === 'Asia');
-console.log(asianCountries);
-
-// Find a specific language
-const english = languages.find(lang => lang.code === 'en');
-console.log(english); // { code: 'en', name: 'English', native: 'English' }
 ```
 
 ### JavaScript (ES6 Modules)
